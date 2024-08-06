@@ -1,8 +1,11 @@
 extends CharacterBody3D
 class_name Actor3D
 
-signal receive_ray_information(value: Dictionary)
+signal receive_pointing_camera_information(value: Dictionary)
+signal disable_physics
+signal enable_physics
 
+@export var groupname_physics: String = 'actor'
 @export_category('Node Control')
 ## Pivot of [Actor3D] or mesh if leave blank then it will be parent node
 @export var pivot_actor: NodePath
@@ -28,6 +31,7 @@ var _gravity := ProjectSettings.get_setting('physics/3d/default_gravity')
 var _navigated_path: NavigatedPath
 var _point_y_rotation: float
 var _pivot_actor: Node3D
+var _is_paused := false
 
 class Physics:
 	var _actor: Actor3D
@@ -88,13 +92,19 @@ class NavigatedPath extends Physics:
 
 # Called when the node enters the scene tree for the first time.
 func _ready():
+	assert(not groupname_physics.is_empty() or groupname_physics != '', 'Actor node must be set for groupname physics')
+	add_to_group(groupname_physics)
+	
 	_pivot_actor = get_node(pivot_actor) if not pivot_actor.is_empty() else get_parent()
 	_point_y_rotation = _pivot_actor.rotation.y
 	
 	if is_navigated_with_cursor:
 		_set_navigation_agent_to_character(_navigation_agent_3d)
 		_navigated_path = NavigatedPath.new($'.', _navigation_agent_3d)
-		receive_ray_information.connect(on_receive_ray_information)
+		receive_pointing_camera_information.connect(on_receive_pointing_camera_information)
+	
+	enable_physics.connect(on_enable_physics)
+	disable_physics.connect(on_disable_physics)
 
 func _set_navigation_agent_to_character(navigation_agent: NavigationAgent3D) -> void:
 	navigation_agent.avoidance_enabled = true
@@ -115,7 +125,6 @@ func _navigated_path_physics_process(delta) -> void:
 	
 	if not is_on_floor():
 		_dump_velocity.y -= _navigated_path.get_gravity_force()
-	print(is_on_floor())
 	
 	_navigated_path.set_velocity(_dump_velocity)
 	
@@ -133,12 +142,21 @@ func _navigated_path_physics_process(delta) -> void:
 
 ## Method signal when [NavigationAgent3D] in [Actor3D] velocity is override
 func on_navigation_veloicity_set(value: Vector3) -> void:
-	velocity = value
+	if not _is_paused:
+		velocity = value
 
 ## Method signal when [Actor3D] is receiving ray information from camera
-func on_receive_ray_information(value: Dictionary) -> void:
-	if not value.is_empty():
+func on_receive_pointing_camera_information(value: Dictionary) -> void:
+	if not value.is_empty() and not _is_paused:
 		_navigation_agent_3d.set_target_position(value.position)
+
+func on_disable_physics() -> void:
+	_is_paused = true
+	set_physics_process(false)
+
+func on_enable_physics() -> void:
+	_is_paused = false
+	set_physics_process(true)
 
 ## Get the object of [NavigationAgent3D]
 func get_navigation_agent() -> NavigationAgent3D:

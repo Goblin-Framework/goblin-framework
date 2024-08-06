@@ -1,6 +1,6 @@
 [gd_scene load_steps=4 format=3 uid="uid://eynqmuljjn22"]
 
-[ext_resource type="Script" path="res://addons/oof/src/components/actor_3d.gd" id="1_osnml"]
+[ext_resource type="Script" path="res://addons/oof/src/actor_3d.gd" id="1_osnml"]
 
 [sub_resource type="CapsuleShape3D" id="CapsuleShape3D_pmevg"]
 radius = 0.2

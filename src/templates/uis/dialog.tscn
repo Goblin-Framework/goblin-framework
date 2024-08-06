@@ -1,0 +1,51 @@
+[gd_scene load_steps=2 format=3 uid="uid://bl8fxbby0xk7p"]
+
+[ext_resource type="Script" path="res://addons/oof/src/components/dialogues.gd" id="1_ffk4f"]
+
+[node name="Dialog" type="Control"]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+script = ExtResource("1_ffk4f")
+main_panel = NodePath("Panel")
+main_padding = Vector2(15, 15)
+active_panel = NodePath("Active")
+active_padding = Vector2(15, 8)
+primary_panel = NodePath("Primary")
+primary_padding = Vector2(15, 8)
+
+[node name="Panel" type="Panel" parent="."]
+layout_mode = 1
+anchors_preset = -1
+anchor_top = 0.790123
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 0
+metadata/_edit_use_anchors_ = true
+
+[node name="Active" type="Panel" parent="."]
+visible = false
+layout_mode = 1
+anchors_preset = -1
+anchor_left = 0.777778
+anchor_top = 0.716049
+anchor_right = 1.0
+anchor_bottom = 0.765432
+grow_horizontal = 2
+grow_vertical = 0
+metadata/_edit_use_anchors_ = true
+
+[node name="Primary" type="Panel" parent="."]
+visible = false
+layout_mode = 1
+anchors_preset = -1
+anchor_top = 0.716049
+anchor_right = 0.222222
+anchor_bottom = 0.765432
+grow_horizontal = 2
+grow_vertical = 0
+metadata/_edit_use_anchors_ = true

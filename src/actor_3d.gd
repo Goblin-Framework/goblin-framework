@@ -148,7 +148,11 @@ func on_navigation_veloicity_set(value: Vector3) -> void:
 ## Method signal when [Actor3D] is receiving ray information from camera
 func on_receive_pointing_camera_information(value: Dictionary) -> void:
 	if not value.is_empty() and not _is_paused:
-		_navigation_agent_3d.set_target_position(value.position)
+		if value.collider.get_class() == 'CharacterBody3D':
+			if value.collider.get_instance_id() != get_instance_id():
+				pass
+		else:
+			_navigation_agent_3d.set_target_position(value.position)
 
 func on_disable_physics() -> void:
 	_is_paused = true

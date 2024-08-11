@@ -37,6 +37,7 @@ var _default_ease: Tween.EaseType
 var _default_seconds: float
 var _hover: Dictionary
 
+
 # Called when the node enters the scene tree for the first time.
 func _ready() -> void:
 	_target = get_parent() if target.is_empty() else get_node(target)

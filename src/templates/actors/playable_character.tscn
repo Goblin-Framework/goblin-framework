@@ -1,17 +1,15 @@
 [gd_scene load_steps=4 format=3 uid="uid://eynqmuljjn22"]
 
-[ext_resource type="Script" path="res://addons/oof/src/actor_3d.gd" id="1_osnml"]
+[ext_resource type="Script" path="res://addons/oof/src/playable_actor_3d.gd" id="1_wmu4v"]
 
 [sub_resource type="CapsuleShape3D" id="CapsuleShape3D_pmevg"]
-radius = 0.2
-height = 1.8
 
 [sub_resource type="CapsuleMesh" id="CapsuleMesh_kgp6l"]
 radius = 0.2
 height = 1.8
 
 [node name="PlayableCharacter" type="CharacterBody3D"]
-script = ExtResource("1_osnml")
+script = ExtResource("1_wmu4v")
 pivot_actor = NodePath("Pivot")
 
 [node name="CollisionShape3D" type="CollisionShape3D" parent="."]

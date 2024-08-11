@@ -1,0 +1,42 @@
+[gd_scene format=3 uid="uid://c2jjcxdhvf10o"]
+
+[node name="Dialogues" type="Control"]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="Panel" type="Panel" parent="."]
+layout_mode = 1
+anchors_preset = -1
+anchor_left = 0.0138889
+anchor_top = 0.777778
+anchor_right = 0.986111
+anchor_bottom = 0.975309
+grow_horizontal = 2
+grow_vertical = 0
+metadata/_edit_use_anchors_ = true
+
+[node name="Panel2" type="Panel" parent="."]
+layout_mode = 1
+anchors_preset = -1
+anchor_left = 0.0138889
+anchor_top = 0.703704
+anchor_right = 0.277778
+anchor_bottom = 0.765432
+grow_horizontal = 2
+grow_vertical = 0
+metadata/_edit_use_anchors_ = true
+
+[node name="Panel3" type="Panel" parent="."]
+layout_mode = 1
+anchors_preset = -1
+anchor_left = 0.722222
+anchor_top = 0.703704
+anchor_right = 0.986111
+anchor_bottom = 0.765432
+grow_horizontal = 2
+grow_vertical = 0
+metadata/_edit_use_anchors_ = true

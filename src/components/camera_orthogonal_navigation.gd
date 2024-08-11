@@ -35,7 +35,7 @@ signal enable_physics
 ## Maximum zoom value (Zoom-out)
 @export_range(8, 20) var max_zoom := 12.0
 
-var _player: Actor3D
+var _player: PlayableActor3D
 var _physics_space_world: PhysicsDirectSpaceState3D
 var _event: Events
 var _is_interact := true
@@ -116,6 +116,7 @@ func _ready():
 	_timer.timeout.connect(on_delay_interact_timeout)
 	call_deferred('add_child', _timer)
 
+# Called when there is an input event is propagates up through the node tree until a node consumes it.
 func _input(event):
 	if event.get_action_strength(zoom_in_input) > 0:
 		_event.zoom_in()

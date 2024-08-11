@@ -1,9 +1,8 @@
-[gd_scene load_steps=13 format=3 uid="uid://dfu64x48vjf84"]
+[gd_scene load_steps=12 format=3 uid="uid://dfu64x48vjf84"]
 
 [ext_resource type="Script" path="res://addons/oof/src/components/camera_orthogonal_navigation.gd" id="1_abdit"]
 [ext_resource type="PackedScene" uid="uid://eynqmuljjn22" path="res://addons/oof/src/templates/actors/playable_character.tscn" id="1_oqra5"]
 [ext_resource type="PackedScene" uid="uid://b186d2o6g2365" path="res://addons/oof/src/templates/uis/debug.tscn" id="3_8vfh0"]
-[ext_resource type="PackedScene" uid="uid://bl8fxbby0xk7p" path="res://addons/oof/src/templates/uis/dialog.tscn" id="4_onqk7"]
 
 [sub_resource type="ProceduralSkyMaterial" id="ProceduralSkyMaterial_0gs6n"]
 
@@ -80,6 +79,3 @@ shadow_enabled = true
 [node name="CanvasLayer" type="CanvasLayer" parent="."]
 
 [node name="debug" parent="CanvasLayer" instance=ExtResource("3_8vfh0")]
-
-[node name="Dialog" parent="CanvasLayer" instance=ExtResource("4_onqk7")]
-visible = false

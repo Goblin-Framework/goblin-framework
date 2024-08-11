@@ -6,7 +6,7 @@ signal disable_physics
 signal enable_physics
 
 @export var groupname_physics: String = 'actor'
-@export_category('Node Control')
+@export_category('Node management')
 ## Pivot of [Actor3D] or mesh if leave blank then it will be parent node
 @export var pivot_actor: NodePath
 
@@ -20,9 +20,16 @@ signal enable_physics
 ## Maximum speed when [Actor3D] is moving
 @export_range(1, 100) var max_speed: float = 12.5
 
-@export_category('Actor Play Control')
+@export_category('Actor player')
 ## When [Actor3D] gameplay is controlled by navigated with cursor
 @export var is_navigated_with_cursor: bool = true
+@export_category('Actor NPC')
+## A node placement for playable [Actor3D] whenever the [Actor3D] NPC is interacted with cursor
+@export var placement_node_interact: NodePath
+var _placement_node_interact: Node3D
+
+@export_category('Debug')
+@export var debug_navigation_movement := true
 
 var _dump_velocity := Vector3.ZERO
 var _navigation_agent_3d := NavigationAgent3D.new()
@@ -61,7 +68,7 @@ class Physics:
 	
 	func get_gravity_force() -> float:
 		return _actor.get_gravity() * _delta
-		
+
 
 class NavigatedPath extends Physics:
 	var _velocity: Vector3
@@ -90,6 +97,7 @@ class NavigatedPath extends Physics:
 		
 		return _velocity
 
+
 # Called when the node enters the scene tree for the first time.
 func _ready():
 	assert(not groupname_physics.is_empty() or groupname_physics != '', 'Actor node must be set for groupname physics')
@@ -97,6 +105,9 @@ func _ready():
 	
 	_pivot_actor = get_node(pivot_actor) if not pivot_actor.is_empty() else get_parent()
 	_point_y_rotation = _pivot_actor.rotation.y
+	
+	if not placement_node_interact.is_empty():
+		_placement_node_interact = get_node(placement_node_interact)
 	
 	if is_navigated_with_cursor:
 		_set_navigation_agent_to_character(_navigation_agent_3d)
@@ -106,22 +117,25 @@ func _ready():
 	enable_physics.connect(on_enable_physics)
 	disable_physics.connect(on_disable_physics)
 
-func _set_navigation_agent_to_character(navigation_agent: NavigationAgent3D) -> void:
-	navigation_agent.avoidance_enabled = true
-	navigation_agent.radius = .25
-	navigation_agent.path_desired_distance = .1
-	navigation_agent.target_desired_distance = .01
-	navigation_agent.velocity_computed.connect(on_navigation_veloicity_set)
-	add_child(navigation_agent)
-
 # Called every frame. 'delta' is the elapsed time since the previous frame.
 func _physics_process(delta):
 	if is_navigated_with_cursor:
 		_navigated_path_physics_process(delta)
 	move_and_slide()
 
+func _set_navigation_agent_to_character(navigation_agent: NavigationAgent3D) -> void:
+	navigation_agent.avoidance_enabled = true
+	navigation_agent.radius = .25
+	navigation_agent.path_desired_distance = .1
+	navigation_agent.target_desired_distance = .01
+	navigation_agent.velocity_computed.connect(on_navigation_veloicity_set)
+	navigation_agent.debug_enabled = debug_navigation_movement
+	add_child(navigation_agent)
+
 func _navigated_path_physics_process(delta) -> void:
 	_navigated_path.set_delta(delta)
+	
+	print(is_on_floor())
 	
 	if not is_on_floor():
 		_dump_velocity.y -= _navigated_path.get_gravity_force()
@@ -150,7 +164,7 @@ func on_receive_pointing_camera_information(value: Dictionary) -> void:
 	if not value.is_empty() and not _is_paused:
 		if value.collider.get_class() == 'CharacterBody3D':
 			if value.collider.get_instance_id() != get_instance_id():
-				pass
+				_navigation_agent_3d.set_target_position(value.collider.get_placement_point_interact().position)
 		else:
 			_navigation_agent_3d.set_target_position(value.position)
 
@@ -181,3 +195,6 @@ func get_velocity() -> Vector3:
 ## Get the value of the point rotation of Y from pivot
 func get_point_rotation_y() -> float:
 	return _point_y_rotation
+
+func get_placement_point_interact() -> Node3D:
+	return _placement_node_interact

@@ -3,8 +3,9 @@ class_name Actor3DNavPathComponent
 
 signal receive_pointing_camera_information(value: Dictionary)
 
-## Radius avoidance collision path navigation
+## Variable for debug purpose in [NavigationAgent3D]
 @export var debug := true
+## Radius avoidance collision path navigation
 @export_range(1, 5) var radius: float:
 	get:
 		return radius * .25
@@ -12,6 +13,7 @@ signal receive_pointing_camera_information(value: Dictionary)
 var _navigation_agent_3d: NavigationAgent3D = NavigationAgent3D.new()
 var _path_finding: PathFinding
 
+## An object class for navigation to finding path for actor
 class PathFinding extends Actor3DProcessor:
 	func _init(node: Actor3DNavPathComponent):
 		super(node)
@@ -31,6 +33,7 @@ class PathFinding extends Actor3DProcessor:
 			else:
 				get_actor().get_navigation_agent().set_target_position(value.position)
 
+## Set the references for signal, method, object, and variable for component [Actor3DNavPathComponent]
 func set_actor_navpath_component(node: Actor3DNavPathComponent) -> void:
 	set_actor_component(node)
 	_navigation_agent_3d.avoidance_enabled = true
@@ -48,6 +51,7 @@ func set_actor_navpath_component(node: Actor3DNavPathComponent) -> void:
 	
 	receive_pointing_camera_information.connect(_path_finding.on_receive_pointing_camera_information)
 
+## Physics process of the [Actor3DNavPathComponent] to references movement, velocity, and direction.
 func set_actor_navpath_physics_process(delta: float) -> void:
 	_path_finding.set_delta(delta)
 	
@@ -68,5 +72,6 @@ func set_actor_navpath_physics_process(delta: float) -> void:
 		else:
 			_path_finding.on_velocity_set(vel)
 
+## Return the navigation agent 3D object
 func get_navigation_agent() -> NavigationAgent3D:
 	return _navigation_agent_3d

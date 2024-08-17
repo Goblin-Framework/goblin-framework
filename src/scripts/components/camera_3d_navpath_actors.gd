@@ -5,6 +5,7 @@ class_name Camera3DNavPathActorsComponent
 @export var playable_actors: Array[NodePath]
 ## Signal name for playable [Actor3D] when camera is pointing to object
 @export var signal_name_interact: String = 'receive_pointing_camera_information'
+## Enable/Disable the projection interaction or select with area collision coverage
 @export var area_collision: bool = false
 
 @export_category('Inputs')
@@ -27,6 +28,7 @@ class NavigationPath extends TopDown:
 		super(node, z_length)
 		_area_collision = area_collision
 	
+	## Return the cursor point that pointing ray to world 3D
 	func get_cursor_point() -> Dictionary:
 		return cursor_in_world_3d(
 			get_camera_cursor_point().origin,
@@ -34,6 +36,7 @@ class NavigationPath extends TopDown:
 			_area_collision
 		)
 
+## Set the references for signal, method, object, and variable for component [Camera3DNavPathActorsComponent]
 func set_camera_navpath_component(node: Camera3DNavPathActorsComponent):
 	# connecting event for disable/enable physics.
 	set_camera_top_down_component($'.')
@@ -51,14 +54,17 @@ func set_camera_navpath_component(node: Camera3DNavPathActorsComponent):
 		for item in playable_actors:
 			if not item.is_empty():
 				_players.append(get_node(item))
-	
+
+## Method for execute action when timer is timeout
 func on_delay_timer_timeout() -> void:
 	_intearct = true
 
+## An simple method to deactive interact and starting the timer
 func deactive_interact() -> void:
 	_intearct = false
 	_timer.start(delay_interact_secs)
 
+## Physics process for the [Camera3DNavPathActorsComponent] movement, direction, and input
 func set_camera_navpath_interact_physics_process(cursor: Vector2) -> void:
 	if Input.get_action_strength(cursor_interact_input) > 0 and not _players.is_empty() and _intearct:
 		_navigation_path.set_cursor_pos(cursor)

@@ -78,7 +78,7 @@ func get_mouse_sensitivity_gap() -> Vector2:
 		
 	return Vector2(ms, ms + mouse_sensitivity)
 
-## Set the basic construct of the [Camera3DComponent]
+## Set the references for signal, method, object, and variable for component [Camera3DComponent]
 func set_camera_component(node: Camera3DComponent) -> void:
 	# Checking the groupname whether is empty or else and then adding to group if the nodes is not in group
 	assert(not groupname.is_empty() or groupname != '', 'Camera3D node must be set for groupname')
@@ -89,13 +89,13 @@ func set_camera_component(node: Camera3DComponent) -> void:
 	enable_physics.connect(_top_down.enable_physics)
 	disable_physics.connect(_top_down.disable_physics)
 
-## Set the construct of the [Camera3DComponent] in top-down projection angle
+## Set the references object and methods of the [Camera3DComponent] in top-down projection angle
 func set_camera_top_down_component(node: Camera3DComponent) -> void:
 	set_camera_component(node)
 	
 	_top_down = TopDown.new($'.', z_length)
 
-## Physics process for the [Camera3DComponent] in top-down projection angle
+## Physics process for the [Camera3DComponent] movement, direction, and input
 func set_camera_events_physics_process(cursor: Vector2) -> void:
 	if Input.get_action_strength(zoom_in_input) > 0:
 		zoom_in()

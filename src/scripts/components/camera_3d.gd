@@ -7,111 +7,102 @@ signal disable_physics
 signal enable_physics
 
 ## Variable group name for the node [Camera3DComponent]
-@export var groupname: String = 'actor'
-
-@export_category('Top-down projection')
-@export var screen_edges_movement: bool = true
-## Z length axis value between [Camera3D] to world 3D
-@export var z_length: float = 100.0
+@export var groupname: String = 'camera'
 ## Input name when zoom in is fired
 @export var zoom_in_input: String = 'zoom_in'
 ## Input name when zoom out is fired
 @export var zoom_out_input: String = 'zoom_out'
+## Input name for reset view back to actor
+@export var reset_view_input: String = 'reset_view'
 ## Step value when zoom events is fired
-@export_range(.1, 1) var zoom_step_ort: float = .25
+@export_range(.1, 1) var zoom_step: float = .25
 ## Minimum zoom value (Zoom-in)
-@export_range(1, 12) var min_zoom_ort: float = 4.0
+@export_range(1, 99) var min_zoom: float = 4.0
 ## Maximum zoom value (Zoom-out)
-@export_range(8, 20) var max_zoom_ort: float = 12.0
-## Mouse sensitivity if projection using movement screen edges
-@export_range(1, 100) var mouse_sensitivity: float = 5.0
+@export_range(1, 99) var max_zoom: float = 12.0
 
-var _top_down: TopDown
-var _mouse_sensitivity = ProjectSettings.get_setting('framework/components/camera/mouse_sensitivity')
+@export_category('Top-down angle')
+## Z length axis value between [Camera3D] to world 3D
+@export var z_length: float = 100.0
+## Enable/Disable camera movement based on cursor on the edges of screen
+@export var screen_edges: bool = true
+@export var follow_actor: bool = true
 
-## Event for top-down projection angle [Camera3D]
-class TopDown extends Camera3DProcessor:
-	func _init(node: Camera3DComponent, z_length: float):
-		super(node)
-		set_z_length(z_length)
+class Physics extends Camera3DPhysicsClass:
 	
-	## Action zoom in [Camera3D]
-	func zoom_in(step: float, orthogonal: bool) -> void:
-		if orthogonal:
-			get_camera().size -= step
-
-	## Action zoom out [Camera3D]
-	func zoom_out(step: float, orthogonal: bool) -> void:
-		if orthogonal:
-			get_camera().size += step
+	func _init(camera: Camera3DComponent):
+		set_camera(camera)
 	
-	## Movement [Camera3D] to the left of the screen
-	func left() -> void:
-		get_camera().transform.origin -= top_down_cross_vector().x
+class PhysicsTopDown extends Physics:
+	var _originated: Vector3
 	
-	## Movement [Camera3D] to the right of the screen
-	func right() -> void:
-		get_camera().transform.origin += top_down_cross_vector().x
-	
-	## Movement [Camera3D] to the top of the screen
-	func up() -> void:
-		get_camera().transform.origin += top_down_cross_vector().y
-	
-	## Movement [Camera3D] to the bottom of the screen
-	func down() -> void:
-		get_camera().transform.origin -= top_down_cross_vector().y
-
-## Action zoom in for [Camera3D] based on the projection and minimal_zoom
-func zoom_in() -> void:
-	if projection == PROJECTION_ORTHOGONAL and size >= min_zoom_ort:
-		_top_down.zoom_in(zoom_step_ort, projection == PROJECTION_ORTHOGONAL)
-
-## Action zoom in for [Camera3D] based on the projection and maximal_zoom
-func zoom_out() -> void:
-	if projection == PROJECTION_ORTHOGONAL and size <= max_zoom_ort:
-		_top_down.zoom_out(zoom_step_ort, projection == PROJECTION_ORTHOGONAL)
-
-## Method to get calculated mouse sensitivity
-func get_mouse_sensitivity_gap() -> Vector2:
-	var ms = ProjectSettings.get_setting('framework/components/camera/mouse_sensitivity')
-	ms = 4.5 if ms == null else ms
+	func _init(camera: Camera3DComponent, sensitivity: float):
+		super(camera)
+		set_cross_vector(Vector2(sensitivity, sensitivity * 1.5))
 		
-	return Vector2(ms, ms + mouse_sensitivity)
+		_originated = get_camera().transform.origin
+	
+	func set_events_by_cursor(cursor: Vector2, step_zoom: float) -> void:
+		set_cursor(cursor)
+		set_zoom_step(step_zoom)
+	
+	func follow_actor() -> void:
+		get_camera().transform.origin = _originated + get_actor().transform.origin
 
-## Set the references for signal, method, object, and variable for component [Camera3DComponent]
-func set_camera_component(node: Camera3DComponent) -> void:
+var _physics_top_down: PhysicsTopDown
+
+## Method for setup base camera
+func setup_camera_base() -> void:
 	# Checking the groupname whether is empty or else and then adding to group if the nodes is not in group
 	assert(not groupname.is_empty() or groupname != '', 'Camera3D node must be set for groupname')
 	
 	if not is_in_group(groupname):
 		add_to_group(groupname)
-	
-	enable_physics.connect(_top_down.enable_physics)
-	disable_physics.connect(_top_down.disable_physics)
 
-## Set the references object and methods of the [Camera3DComponent] in top-down projection angle
-func set_camera_top_down_component(node: Camera3DComponent) -> void:
-	set_camera_component(node)
+func setup_camera_top_down_angle(camera: Camera3DComponent, sensitivity: float) -> void:
+	setup_camera_base()
 	
-	_top_down = TopDown.new($'.', z_length)
+	_physics_top_down = PhysicsTopDown.new(camera, sensitivity)
+	
+	enable_physics.connect(_physics_top_down.enable_physics)
+	disable_physics.connect(_physics_top_down.disable_physics)
 
-## Physics process for the [Camera3DComponent] movement, direction, and input
-func set_camera_events_physics_process(cursor: Vector2) -> void:
+func physics_process_camera_top_down_angle(delta: float) -> void:
+	var cursor = get_viewport().get_mouse_position()
+	
+	_physics_top_down.set_events_by_cursor(cursor, zoom_step)
+	_physics_top_down.set_viewport_size(get_viewport().get_window().size)
+	
 	if Input.get_action_strength(zoom_in_input) > 0:
-		zoom_in()
+		_physics_top_down.zoom_in(min_zoom)
 		
 	if Input.get_action_strength(zoom_out_input) > 0:
-		zoom_out()
+		_physics_top_down.zoom_out(max_zoom)
 	
-	if screen_edges_movement:
-		if cursor.x < 1:
-			_top_down.left()
+	if screen_edges:
+		if _physics_top_down.get_cursor_edges() == 'up':
+			follow_actor = false
+			_physics_top_down.upward()
 		
-		if cursor.y < 1:
-			_top_down.up()
+		if _physics_top_down.get_cursor_edges() == 'down':
+			follow_actor = false
+			_physics_top_down.downward()
 		
-		if get_viewport().get_window().size.x - cursor.x <= 1:
-			_top_down.right()
+		if _physics_top_down.get_cursor_edges() == 'left':
+			follow_actor = false
+			_physics_top_down.leftward()
 		
-		if get_viewport().get_window().size.y - cursor.y <= 1:
-			_top_down.down()
+		if _physics_top_down.get_cursor_edges() == 'right':
+			follow_actor = false
+			_physics_top_down.rightward()
+	
+	if follow_actor and _physics_top_down.get_actor() != null:
+		_physics_top_down.follow_actor()
+
+func input_camera_top_down_angle(event) -> void:
+	if Input.is_action_just_pressed(reset_view_input):
+		follow_actor = true
+
+func set_camera_actor_top_down(node: CharacterBody3D) -> void:
+	_physics_top_down.set_actor(node) 
+	

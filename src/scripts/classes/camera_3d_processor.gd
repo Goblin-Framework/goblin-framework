@@ -1,31 +1,58 @@
-extends Camera3DBasePhysics
-class_name Camera3DProcessor
+extends Camera3DClass
+class_name Camera3DProcessorClass
 
-var _ray_query_3d: PhysicsRayQueryParameters3D
-var _world_space_3d: PhysicsDirectSpaceState3D
-var _z: float
+## Variable reference for object [PhysicsRayQueryParameters3D]
+var _ray_query: PhysicsRayQueryParameters3D = PhysicsRayQueryParameters3D.new()
 
-## Method constructor for [Camera3DTopDown]
-func _init(node: Camera3D):
-	super(node)
-	_ray_query_3d = PhysicsRayQueryParameters3D.new()
+## Variable reference for cross vector value for horizontal and vertical transform
+var _cross_vector: Dictionary
 
-## Set the value of physics space 3D
-func set_world_3d_space(value: PhysicsDirectSpaceState3D):
-	_world_space_3d = value
+## Set cross vector value for horizontal and vertical transform position on mouse sensitivity
+func set_cross_vector(sensitivity: Vector2) -> void:
+	_cross_vector.horizontal = _node.transform.basis.z.cross(Vector3(1, 0, 1)) / sensitivity.x
+	_cross_vector.vertical   = _node.transform.basis.z.cross(Vector3(1, 0, -1)) / sensitivity.y
 
-## Calculate the cursor position based on the origin and target [Vector3]
-func cursor_in_world_3d(origin: Vector3, target: Vector3, collide_with_areas := false) -> Dictionary:
-	_ray_query_3d.from = origin
-	_ray_query_3d.to   = target
-	_ray_query_3d.collide_with_areas = collide_with_areas
+## Return the cross vector value for horizontal and vertical transform position
+func get_cross_vector() -> Dictionary:
+	return _cross_vector
+
+## Variable reference ray [Camera3D] into world 3D
+var _camera_ray: Dictionary
+
+## A method to projecting ray [Camera3D] into world 3D
+func projecting_camera_ray() -> void:
+	_camera_ray.origin = _node.project_ray_origin(get_cursor())
+	_camera_ray.target = _node.project_ray_normal(get_cursor()) * get_z_length() + _camera_ray.origin
+
+## Return the value of ray [Camera3D] 
+func get_camera_ray() -> Dictionary:
+	return _camera_ray
+
+## Variable bucket for projection information between intersection ray of camera and world 3D
+var _projection_information: Dictionary
+
+## Set the information of projection ray between camera and world 3D
+func set_world_3D_projection_ray(world_3d: PhysicsDirectSpaceState3D, area_collision: bool):
+	assert(not get_camera_ray().is_empty(), '')
 	
-	return _world_space_3d.intersect_ray(_ray_query_3d)
+	_ray_query.from = get_camera_ray().origin
+	_ray_query.to   = get_camera_ray().target
+	_ray_query.collide_with_areas = area_collision
+	
+	_projection_information = world_3d.intersect_ray(_ray_query)
 
-## Set the Z length for top down 3D
-func set_z_length(value: float):
-	_z = value
+## Return the information of projection ray between camera and world 3D
+func get_world_3D_projection_ray() -> Dictionary:
+	return _projection_information
 
-## Get the result of cursor point in top-down
-func get_camera_cursor_point() -> Dictionary:
-	return camera_ray_pos(_z)
+func get_cursor_edges() -> Variant:
+	if get_cursor().y < 1:
+		return 'up'
+	if get_cursor().x < 1:
+		return 'left'
+	if get_viewport_size().x - get_cursor().x <= 1:
+		return 'right'
+	if get_viewport_size().y - get_cursor().y <= 1:
+		return 'down'
+	
+	return null

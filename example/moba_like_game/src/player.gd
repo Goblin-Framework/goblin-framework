@@ -1,8 +1,8 @@
-extends Actor3DNavPathComponent
+extends Actor3DNavigatedComponent
 
 func _ready():
-	set_actor_navpath_component($'.')
+	setup_actor_navigated($'.')
 
 func _physics_process(delta):
-	set_actor_navpath_physics_process(delta)
+	physics_process_actor_navigated(delta)
 	move_and_slide()

@@ -13,13 +13,13 @@ signal enable_physics
 
 @export_category('Physics')
 ## Angular acceleration value when [Actor3DComponent] is rotating
-@export_range(1, 20) var angular_acceleration: float = 4.5
+@export_range(1, 20) var angular: float = 4.5
 ## Acceleration increase when [Actor3DComponent] is starting going to move
-@export_range(1, 100) var velocity_acceleration: float = 16.0
+@export_range(1, 100) var acceleration: float = 16.0
 ## De-Acceleration increase when [Actor3DComponent] is starting going to stop
-@export_range(1, 100) var velocity_deacceleration: float = 9.0
+@export_range(1, 100) var deacceleration: float = 9.0
 ## Maximum speed when [Actor3DComponent] is moving
-@export_range(1, 100) var max_speed: float = 12.5
+@export_range(1, 100) var speed: float = 12.5
 
 ## Velocity variable references
 var vel: Vector3
@@ -31,27 +31,30 @@ var pivot: Node3D
 # references variable for physics class [Actor3DComponent]
 var _physics: Physics
 
-## Class for base component physics
-class Physics extends Actor3DBasePhysics:
-	func _init(node: Actor3DComponent):
-		super(node)
+var _pivot: Node3D
 
-## Set the references for signal, method, object, and variable for component [Actor3DComponent]
-func set_actor_component(node: Actor3DComponent) -> void:
+## Class for base component physics
+class Physics extends Actor3DPhysics:
+	func _init(node: Actor3DComponent):
+		set_actor(node)
+
+func setup_actor_base(node: Actor3DComponent, object: Physics) -> void:
 	# Checking the groupname whether is empty or else and then adding to group if the nodes is not in group
-	assert(not groupname.is_empty() or groupname != '', 'Actor node must be set for groupname')
+	assert(not groupname.is_empty() or groupname != '', 'Camera3D node must be set for groupname')
 	
 	if not is_in_group(groupname):
 		add_to_group(groupname)
 	
-	pivot = get_node(pivot_mesh_node)
-	_physics = Physics.new(node)
+	_pivot = get_node(pivot_mesh_node)
 	
-	# connecting event for disable/enable physics.
-	disable_physics.connect(_physics.disable_physics)
-	enable_physics.connect(_physics.enable_physics)
-
-## Return the gravity value from the settings
-func get_gravity():
-	return ProjectSettings.get_setting('physics/3d/default_gravity')
-
+	object.set_acceleration(acceleration)
+	object.set_deacceleration(deacceleration)
+	object.set_angular(angular)
+	object.set_speed(speed)
+	object.set_pivot_y(_pivot.rotation.y)
+	object.set_direction(Vector3.ZERO)
+	object.set_velocity(Vector3.ZERO)
+	object.set_gravity(ProjectSettings.get("physics/3d/default_gravity"))
+	
+	enable_physics.connect(object.enable_physics)
+	disable_physics.connect(object.disable_physics)

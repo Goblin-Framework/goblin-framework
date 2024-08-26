@@ -1,36 +1,35 @@
-extends Actor3DBasePhysics
+extends Actor3DClass
 class_name Actor3DProcessor
 
-var _velocity: Vector3
-var _navigation_agent: NavigationAgent3D
+## Variable reference for navigation agent 3D path
+var _navigation_agent_3d: NavigationAgent3D
 
-## Method constructor for [Actor3DProcessor]
-func _init(node: CharacterBody3D):
-	super(node)
-
-## Return the calculated course distance for navigated actor
-func get_course_distance() -> Vector3:
-	return _navigation_agent.get_next_path_position() - _actor.global_position
-
-## Set the navigation agent 3D node
+## Set the navigation agent 3D variable
 func set_navigation_agent(node: NavigationAgent3D) -> void:
-	_navigation_agent = node
+	_navigation_agent_3d = node
 
-## Set the [Vector3] value of velocity actor
-func set_velocity(value: Vector3) -> void:
-	_velocity = value
+## Return the node navigation agent 3D
+func get_navigation_agent() -> NavigationAgent3D:
+	return _navigation_agent_3d
 
-## Return the [Vector3] value of velocity actor
-func get_velocity() -> Vector3:
-	return _velocity
+## Return the calculated navigation distance for [CharacterBody3D]
+func get_navigation_distance() -> Vector3:
+	return get_navigation_agent().get_next_path_position() - get_actor().global_position
 
-## Return the calculated [Vector3] velocity actor by navigation path
-func get_velocity_by_navigation() -> Vector3:
-	var tmp_velocity = get_velocity_interpolated()
-	_velocity.z = tmp_velocity.z
-	_velocity.x = tmp_velocity.x
-	
-	if _actor.dir.y > .1:
-		_velocity.y = tmp_velocity.y - get_gravity_force()
-	
-	return _velocity
+## Return the calculated rotation toward [CharacterBody3D] direction movement
+func get_rotation_toward_direction() -> float:
+	return lerp_angle(
+		get_pivot_y(),
+		atan2(get_direction().x, get_direction().z),
+		get_angular() * get_delta()
+	)
+
+## Return the calculated interpolated velocity
+func get_velocity_interpolated() -> Vector3:
+	var normalized = get_direction().normalized()
+	var hvel = normalized
+	hvel.y = 0
+
+	var course = normalized * get_speed()
+	var accel  = get_acceleration() if normalized.dot(hvel) > 0 else get_deacceleration()
+	return hvel.lerp(course, accel * get_delta())

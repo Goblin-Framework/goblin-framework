@@ -9,8 +9,8 @@ var _cross_vector: Dictionary
 
 ## Set cross vector value for horizontal and vertical transform position on mouse sensitivity
 func set_cross_vector(sensitivity: Vector2) -> void:
-	_cross_vector.horizontal = _node.transform.basis.z.cross(Vector3(1, 0, 1)) / sensitivity.x
-	_cross_vector.vertical   = _node.transform.basis.z.cross(Vector3(1, 0, -1)) / sensitivity.y
+	_cross_vector.horizontal = get_camera().transform.basis.z.cross(Vector3(1, 0, 1)) / sensitivity.x
+	_cross_vector.vertical   = get_camera().transform.basis.z.cross(Vector3(1, 0, -1)) / sensitivity.y
 
 ## Return the cross vector value for horizontal and vertical transform position
 func get_cross_vector() -> Dictionary:
@@ -21,8 +21,8 @@ var _camera_ray: Dictionary
 
 ## A method to projecting ray [Camera3D] into world 3D
 func projecting_camera_ray() -> void:
-	_camera_ray.origin = _node.project_ray_origin(get_cursor())
-	_camera_ray.target = _node.project_ray_normal(get_cursor()) * get_z_length() + _camera_ray.origin
+	_camera_ray.origin = get_camera().project_ray_origin(get_cursor())
+	_camera_ray.target = get_camera().project_ray_normal(get_cursor()) * get_z_length() + _camera_ray.origin
 
 ## Return the value of ray [Camera3D] 
 func get_camera_ray() -> Dictionary:
@@ -45,6 +45,7 @@ func set_world_3D_projection_ray(world_3d: PhysicsDirectSpaceState3D, area_colli
 func get_world_3D_projection_ray() -> Dictionary:
 	return _projection_information
 
+## Return the string information about the edges cursor position in viewport
 func get_cursor_edges() -> Variant:
 	if get_cursor().y < 1:
 		return 'up'

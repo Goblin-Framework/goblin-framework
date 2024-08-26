@@ -49,60 +49,56 @@ class PhysicsTopDown extends Physics:
 	func follow_actor() -> void:
 		get_camera().transform.origin = _originated + get_actor().transform.origin
 
-var _physics_top_down: PhysicsTopDown
+var _object: Physics
 
 ## Method for setup base camera
-func setup_camera_base() -> void:
+func setup_camera_base(camera: Camera3DComponent, sensitivity: float, object: Physics) -> void:
 	# Checking the groupname whether is empty or else and then adding to group if the nodes is not in group
 	assert(not groupname.is_empty() or groupname != '', 'Camera3D node must be set for groupname')
 	
 	if not is_in_group(groupname):
 		add_to_group(groupname)
-
-func setup_camera_top_down_angle(camera: Camera3DComponent, sensitivity: float) -> void:
-	setup_camera_base()
 	
-	_physics_top_down = PhysicsTopDown.new(camera, sensitivity)
+	_object = object
 	
-	enable_physics.connect(_physics_top_down.enable_physics)
-	disable_physics.connect(_physics_top_down.disable_physics)
+	enable_physics.connect(object.enable_physics)
+	disable_physics.connect(object.disable_physics)
 
-func physics_process_camera_top_down_angle(delta: float) -> void:
+func physics_process_camera_base(delta: float) -> void:
 	var cursor = get_viewport().get_mouse_position()
 	
-	_physics_top_down.set_events_by_cursor(cursor, zoom_step)
-	_physics_top_down.set_viewport_size(get_viewport().get_window().size)
+	_object.set_events_by_cursor(cursor, zoom_step)
+	_object.set_viewport_size(get_viewport().get_window().size)
 	
 	if Input.get_action_strength(zoom_in_input) > 0:
-		_physics_top_down.zoom_in(min_zoom)
+		_object.zoom_in(min_zoom)
 		
 	if Input.get_action_strength(zoom_out_input) > 0:
-		_physics_top_down.zoom_out(max_zoom)
-	
+		_object.zoom_out(max_zoom)
+		
 	if screen_edges:
-		if _physics_top_down.get_cursor_edges() == 'up':
+		if _object.get_cursor_edges() == 'up':
 			follow_actor = false
-			_physics_top_down.upward()
+			_object.upward()
 		
-		if _physics_top_down.get_cursor_edges() == 'down':
+		if _object.get_cursor_edges() == 'down':
 			follow_actor = false
-			_physics_top_down.downward()
+			_object.downward()
 		
-		if _physics_top_down.get_cursor_edges() == 'left':
+		if _object.get_cursor_edges() == 'left':
 			follow_actor = false
-			_physics_top_down.leftward()
+			_object.leftward()
 		
-		if _physics_top_down.get_cursor_edges() == 'right':
+		if _object.get_cursor_edges() == 'right':
 			follow_actor = false
-			_physics_top_down.rightward()
+			_object.rightward()
 	
-	if follow_actor and _physics_top_down.get_actor() != null:
-		_physics_top_down.follow_actor()
+	if follow_actor and _object.get_actor() != null:
+		_object.follow_actor()
 
-func input_camera_top_down_angle(event) -> void:
+func input_camera_base(event) -> void:
 	if Input.is_action_just_pressed(reset_view_input):
 		follow_actor = true
-
-func set_camera_actor_top_down(node: CharacterBody3D) -> void:
-	_physics_top_down.set_actor(node) 
 	
+func set_actor_camera(actor: CharacterBody3D) -> void:
+	_object.set_actor(actor)

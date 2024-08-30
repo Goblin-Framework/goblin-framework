@@ -31,16 +31,13 @@ signal disable_physics
 ## Signal to trigger enable/activate physics_process
 signal enable_physics
 
-@export_category('Inputs')
 @export var groupname: String = 'camera'
 ## Input name when zoom in is fired
+@export_subgroup('Inputs')
 @export var zoom_in_input: String = 'zoom_in'
 ## Input name when zoom out is fired
 @export var zoom_out_input: String = 'zoom_out'
-## Input name for reset view back to actor
-@export var reset_view_input: String = 'reset_view'
-
-@export_category('Events')
+@export_subgroup('Zoom')
 ## Step value when zoom events is fired
 @export_range(.1, 1) var zoom_step: float = .25
 ## Minimum zoom value (Zoom-in)
@@ -57,14 +54,18 @@ signal enable_physics
 @export var follow_actor: bool = true
 
 @export_category('Point-Click')
+## Enable/Disable the projection interaction or select with area collision coverage
+@export var area_collision: bool = false
+@export_subgroup('Inputs')
+## Input name for reset view back to actor
+@export var reset_view_input: String = 'reset_view'
 ## Input name when cursor is interacting to object/colliision
 @export var cursor_interact_input: String = 'cursor_interact'
 ## Input name when cursor is selecting to object/colliision
 @export var cursor_select_input: String = 'cursor_select'
-## Enable/Disable the projection interaction or select with area collision coverage
-@export var area_collision: bool = false
 ## Number of interval delay when interact is inactive and active
 @export_range(.1, 3) var delay_interact_interval: float = .5
+@export_subgroup('Actors')
 ## Node path for playable [Actor3D]
 @export var playable_actors: Array[NodePath]
 ## Signal name for playable [Actor3D] when camera is pointing to object

@@ -14,3 +14,11 @@ func navigated_velocity(max_climb: float) -> void:
 	
 	set_velocity(velocity)
 
+func health_point_consumed(value: int) -> void:
+	health_point_updated(-value)
+
+func force_point_consumed(value: int) -> void:
+	force_point_updated(-value)
+
+func stamina_point_consumed(value: int) -> void:
+	stamina_point_updated(-value)

@@ -77,7 +77,7 @@ var top_down: TopDown
 
 func construct_camera_base(object: Base) -> void:
 		# Checking the groupname whether is empty or else and then adding to group if the nodes is not in group
-	assert(not groupname.is_empty() or groupname != '', 'Camera3D node must be set for groupname')
+	assert(not groupname.is_empty() or groupname != '', Commons.camview_groupname_required)
 	
 	if not is_in_group(groupname):
 		add_to_group(groupname)
@@ -108,12 +108,6 @@ func physics_process_camera_base(delta: float, object: Base) -> void:
 	object.set_events_by_cursor(cursor, zoom_step)
 	object.set_viewport_size(get_viewport().get_window().size)
 	
-	if Input.get_action_strength(zoom_in_input) > 0:
-		object.zoom_in(min_zoom)
-		
-	if Input.get_action_strength(zoom_out_input) > 0:
-		object.zoom_out(max_zoom)
-		
 	if screen_edges:
 		if object.get_cursor_edges() == 'up':
 			follow_actor = false
@@ -151,6 +145,13 @@ func input_camera_follow_actor() -> void:
 	if Input.is_action_just_pressed('reset_view') and not follow_actor:
 		follow_actor = true
 		top_down.follow_actor()
+
+func input_camera_zoom(event) -> void:
+	if event.get_action_strength(zoom_in_input) > 0:
+		top_down.zoom_in(min_zoom)
+		
+	if event.get_action_strength(zoom_out_input) > 0:
+		top_down.zoom_out(max_zoom)
 
 ## Method for execute action when timer is timeout
 func on_delay_timer_timeout() -> void:

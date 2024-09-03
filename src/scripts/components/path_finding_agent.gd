@@ -3,6 +3,7 @@ class_name PathFindingAgentComponent
 
 var _actor: Actor3D
 
+# Called when the node enters the scene tree for the first time.
 func _ready():
 	_actor = get_parent()
 	_actor.component_set_navigation_agent($'.')

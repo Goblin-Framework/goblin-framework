@@ -86,7 +86,6 @@ func _animate(values: Dictionary, prop: Array, seconds: float, transition_type: 
 	for item in properties:
 		tween.tween_property(_target, str(item), values[item], seconds).set_trans(transition_type).set_ease(ease_type)
 
-
 func _on_event_up() -> void:
 	_default_transition = event_transition
 	_default_ease       = event_ease

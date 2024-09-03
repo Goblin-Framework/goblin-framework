@@ -116,13 +116,51 @@ func set_gravity(value: float):
 func get_gravitational_force() -> float:
 	return _gravity * get_delta()
 
-## Variable reference for pivot axis in Y point
-var _pivot_y: float
+var _face: Node3D
+
+func set_face(node: Node3D) -> void:
+	_face = node
+
+func get_face() -> Node3D:
+	return _face
 
 ## Set the variable reference for pivot axis Y
-func set_pivot_y(value: float):
-	_pivot_y = value
+func set_face_rotation(value: float):
+	get_face().rotation.y = value
 
 ## Return the value pivot axis Y
-func get_pivot_y() -> float:
-	return _pivot_y
+func get_face_rotation() -> float:
+	return get_face().rotation.y
+
+## Variable reference for health point for [CharacterBody3D]
+var _health_point: int
+
+## Set the variable reference for health point of the [CharacterBody3D]
+func set_health_point(value: int) -> void:
+	_health_point = value
+
+## Returnt the health point value of the [CharacterBody3D]
+func get_health_point() -> int:
+	return _health_point
+
+## Variable reference for force point for [CharacterBody3D]
+var _force_point: int
+
+## Set the variable reference for force point of the [CharacterBody3D]
+func set_force_point(value: int) -> void:
+	_force_point = value
+
+## Returnt the force point value of the [CharacterBody3D]
+func get_force_point() -> int:
+	return _force_point
+
+## Variable reference for stamina point for [CharacterBody3D]
+var _stamina_point: int
+
+## Set the variable reference for stamina point of the [CharacterBody3D]
+func set_stamina_point(value: int) -> void:
+	_stamina_point = value
+
+## Returnt the stamina point value of the [CharacterBody3D]
+func get_stamina_point() -> int:
+	return _stamina_point

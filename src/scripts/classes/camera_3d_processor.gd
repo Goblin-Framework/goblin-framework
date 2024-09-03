@@ -33,8 +33,6 @@ var _projection_information: Dictionary
 
 ## Set the information of projection ray between camera and world 3D
 func set_world_3D_projection_ray(world_3d: PhysicsDirectSpaceState3D, area_collision: bool):
-	assert(not get_camera_ray().is_empty(), '')
-	
 	_ray_query.from = get_camera_ray().origin
 	_ray_query.to   = get_camera_ray().target
 	_ray_query.collide_with_areas = area_collision

@@ -30,7 +30,9 @@ func _physics_process(delta):
 		if i.is_colliding():
 			var collider = i.get_collider()
 			if _actor.navigation != null:
-				_actor.navigation.get_navigation_agent().target_position = collider.position
+				_actor.navigation.get_navigation_agent().target_position = _actor.global_position
+				print(collider.base.get_randomize_greetings())
+				emit_signal('disable_interaction_casts')
 
 ## Instantiate a new [RayCast3D] with it's requirements
 func ray_cast(rotate: float, mask: int) -> RayCast3D:
@@ -74,16 +76,17 @@ func construct_interaction_casts() -> void:
 	radius = radius if mirror else radius / 2
 	
 	# check if number of maximum [RayCast3D] is either even or odd
-	if max_raycasts % 2 != 0:
+	if max_raycasts % 2 == 0:
 		pass
 	else:
 		max_raycasts = max_raycasts - 1 if mirror else max_raycasts / 2
 		median = floor(max_raycasts)
 	
+	# Set the lists offset of the ray casts
 	set_lists_offset_ray_casts(max_raycasts, radius / max_raycasts)
 	
 	if median > 0:
-		_offset.insert(median, ray_cast(0, _actor.get_collision_mask()))
+		_offset.insert(median, ray_cast(0, _actor.get_collision_layer()))
 	
 	for i in get_list_ray_casts():
 		call_deferred('add_child', i)

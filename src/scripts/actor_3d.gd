@@ -11,6 +11,10 @@ class Base extends Actor3DPhysics:
 		if get_physics():
 			set_velocity(value)
 			get_actor().velocity = get_velocity()
+	
+	func get_randomize_greetings() -> String:
+		var i = randi_range(0, get_actor().greetings.size() - 1)
+		return get_actor().greetings[i]
 
 ## Class utilities for [Actor3D] that use movement based on navigation path finding
 class Navigation extends Base:
@@ -60,70 +64,10 @@ signal enable_physics
 ## Maximum speed when [Actor3DComponent] is moving
 @export_range(1, 99) var speed: float = 12.5
 
+@export_category('NPC')
+@export var greetings: Array[String]
+
 ## Variable base object class
 var base: Base
 ## Variable navigation object class
 var navigation: Navigation
-
-## Main construct method for [Actor3D]
-func construct_actor(object: Base) -> void:
-	# Checking the groupname whether is empty or else and then adding to group if the nodes is not in group
-	assert(not groupname.is_empty() or groupname != '', Commons.actor_groupname_required)
-	
-	if not is_in_group(groupname):
-		add_to_group(groupname)
-	
-	object.set_acceleration(acceleration)
-	object.set_deacceleration(deacceleration)
-	object.set_angular(angular)
-	object.set_speed(speed)
-	object.set_face(get_node(face_node))
-	object.set_direction(Vector3.ZERO)
-	object.set_velocity(Vector3.ZERO)
-	object.set_gravity(ProjectSettings.get("physics/3d/default_gravity"))
-	
-	enable_physics.connect(object.enable_physics)
-	disable_physics.connect(object.disable_physics)
-
-func construct_actor_only_base(node: Actor3D) -> void:
-	base = Base.new(node)
-	construct_actor(base)
-
-func construct_actor_path_finding(node: Actor3D) -> void:
-	navigation = Navigation.new(node)
-	
-	construct_actor(navigation)
-	receive_pointing_camera_information.connect(navigation.on_receive_pointing_camera_information)
-
-func physics_proces_actor_only_base(delta: float) -> void:
-	var vel = base.get_velocity()
-	base.set_delta(delta)
-	
-	if !is_on_floor():
-		vel.y -= base.get_gravitational_force()
-		base.set_velocity(vel)
-
-func physics_process_actor_path_finding(delta: float) -> void:
-	var vel = navigation.get_velocity()
-	navigation.set_delta(delta)
-	
-	if !is_on_floor():
-		vel.y -= navigation.get_gravitational_force()
-		navigation.set_velocity(vel)
-	
-	if navigation.get_navigation_agent().is_navigation_finished():
-		velocity = Vector3.ZERO
-		velocity.y = navigation.get_velocity().y
-	else:
-		navigation.set_direction(navigation.get_navigation_distance())
-		navigation.navigated_velocity(.1)
-		navigation.set_face_rotation(navigation.get_rotation_toward_direction())
-		
-		if navigation.get_navigation_agent().avoidance_enabled:
-			navigation.get_navigation_agent().set_velocity(navigation.get_velocity())
-		else:
-			navigation.set_velocity_process(navigation.get_velocity())
-
-func component_set_navigation_agent(node: NavigationAgent3D) -> void:
-	navigation.set_navigation_agent(node)
-

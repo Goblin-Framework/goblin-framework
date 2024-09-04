@@ -3,7 +3,7 @@ class_name Actor3D
 
 ## Class utilities base for [Actor3D] for the basic physics and process in actor
 class Base extends Actor3DPhysics:
-	func _init(node: Actor3D):
+	func _init(node: Actor3D) -> void:
 		set_actor(node)
 	
 	## Set the velocity processing of the [Actor3D] if physics status is enable
@@ -18,7 +18,7 @@ class Base extends Actor3DPhysics:
 
 ## Class utilities for [Actor3D] that use movement based on navigation path finding
 class Navigation extends Base:
-	func _init(node: Actor3D):
+	func _init(node: Actor3D) -> void:
 		super(node)
 	
 	func on_receive_pointing_camera_information(value: Dictionary) -> void:

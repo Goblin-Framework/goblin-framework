@@ -1,7 +1,9 @@
 class_name Commons
 
-static var actor_groupname_required = 'Parameter groupname for Actor node is required'
-static var camview_groupname_required = 'Parameter groupname for Camview node is required'
+static var actor_groupname_required     = 'Parameter groupname for Actor node is required'
+static var camview_groupname_required   = 'Parameter groupname for Camview node is required'
+static var inventory_groupname_required = 'Parameter groupname for Inventory node is required'
+static var item_groupname_required      = 'Parameter groupname for Item node is required'
 
 static func check_typeof(value: Variant) -> String:
 	if typeof(value) == TYPE_FLOAT:

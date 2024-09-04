@@ -1,23 +1,27 @@
 extends Camera3D
 class_name CamView3D
 
+## Class utilities base for [CamView3D] for the basic physics and process
 class Base extends Camera3DPhysicsClass:
-	func _init(node: CamView3D):
+	func _init(node: CamView3D) -> void:
 		set_camera(node)
-		
+	
+	## Set the events that using cursor or mouse
 	func set_events_by_cursor(cursor: Vector2, step_zoom: float) -> void:
 		set_cursor(cursor)
 		set_zoom_step(step_zoom)
 
+## Class utilities for angle top-down in [CamView3D]
 class TopDown extends Base:
 	var _origin: Vector3
 	
-	func _init(node: CamView3D, sensitivity: float):
+	func _init(node: CamView3D, sensitivity: float) -> void:
 		super(node)
 		set_cross_vector(Vector2(sensitivity, sensitivity * 1.5))
 		
 		_origin = get_camera().transform.origin
-		
+	
+	## Modifier transform origin of the [CamView3D] following with player origin
 	func follow_actor() -> void:
 		get_camera().transform.origin = _origin + get_actor().transform.origin
 

@@ -12,14 +12,14 @@ func get_game() -> Node3D:
 	return _game
 
 ## Variable reference for currency in game
-var _currency: int
+var _currency: float
 
 ## Set the variable reference currency in game
-func set_currency(value: int) -> void:
+func set_currency(value: float) -> void:
 	_currency = value
 
 ## Return the variable reference currency in game
-func get_currency() -> int:
+func get_currency() -> float:
 	return _currency
 
 ## Variable reference for experience in game

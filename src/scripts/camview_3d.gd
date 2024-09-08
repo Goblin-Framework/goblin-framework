@@ -67,6 +67,7 @@ signal enable_physics
 @export_subgroup('Actors')
 ## Node path for playable [Actor3D]
 @export var playable_actors: Array[NodePath]
+@export var actor: Array[Actor3D]
 ## Signal name for playable [Actor3D] when camera is pointing to object
 @export var signal_name_interact: String = 'receive_pointing_camera_information'
 ## Key index for focusing which actor to be selected

@@ -26,12 +26,16 @@ func construct_camview_top_down(node: CamView3D, sensitivity: float) -> void:
 	timer.autostart = false
 	timer.timeout.connect(_on_enable_interaction)
 	
-	if not playable_actors.is_empty():
+	if not playable_actors.is_empty() and actor.is_empty():
 		_actor_player = []
 		
-		for actor in playable_actors:
-			if not actor.is_empty():
-				_actor_player.append(get_node(actor))
+		for i in playable_actors:
+			if not i.is_empty():
+				_actor_player.append(get_node(i))
+				
+	if not actor.is_empty():
+		for i in actor:
+			_actor_player.append(i)
 	
 	call_deferred('add_child', timer)
 

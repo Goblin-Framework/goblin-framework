@@ -1,6 +1,8 @@
 extends Actor3D
 class_name Actor3DTemplate
 
+var _interaction: bool = false
+
 ## Constructor method for [Actor3D] object
 func construct_actor_object(object: Base) -> void:
 	# Checking the groupname whether is empty or else and then adding to group if the nodes is not in group
@@ -53,3 +55,12 @@ func physics_process_actor_path_finding(delta: float) -> void:
 			navigation.get_navigation_agent().set_velocity(navigation.get_velocity())
 		else:
 			navigation.set_velocity_process(navigation.get_velocity())
+
+func enable_interaction() -> void:
+	_interaction = true
+
+func disable_interaction() -> void:
+	_interaction = false
+
+func get_interaction() -> bool:
+	return _interaction

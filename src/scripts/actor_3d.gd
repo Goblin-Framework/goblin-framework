@@ -1,57 +1,16 @@
 extends CharacterBody3D
 class_name Actor3D
 
-## Class utilities base for [Actor3D] for the basic physics and process in actor
-class Base extends Actor3DPhysics:
-	func _init(node: Actor3D) -> void:
-		set_actor(node)
-	
-	## Set the velocity processing of the [Actor3D] if physics status is enable
-	func set_velocity_process(value: Vector3) -> void:
-		if get_physics():
-			set_velocity(value)
-			get_actor().velocity = get_velocity()
-	
-	func get_randomize_greetings() -> String:
-		var i = randi_range(0, get_actor().greetings.size() - 1)
-		return get_actor().greetings[i]
-
-## Class utilities for [Actor3D] that use movement based on navigation path finding
-class Navigation extends Base:
-	var _actor_target: CharacterBody3D
-	
-	func _init(node: Actor3D) -> void:
-		super(node)
-	
-	func on_receive_pointing_camera_information(value: Dictionary) -> void:
-		if not value.is_empty() and get_physics():
-			var collide_with = value.collider
-			
-			if collide_with.get_class() == 'CharacterBody3D' and collide_with.get_instance_id() != get_actor().get_instance_id():
-				_actor_target = collide_with
-				print(_actor_target)
-				
-				if get_face().has_signal('enable_interaction_casts'):
-					get_face().emit_signal('enable_interaction_casts', value.collider.get_instance_id())
-					
-			if _actor_target != null and _actor_target.has_signal('off_casts_target'):
-				_actor_target.emit_signal('off_casts_target')
-				
-			get_navigation_agent().set_target_position(value.position)
-
-var _face: Face3DComponent
-var _target_id
-
-## Signal to trigger when receiving pointing camera information in 3D space
-signal receive_pointing_camera_information(value: Dictionary)
+## Signal to trigger when navigation is interacting to
+signal navigation_interact_to(value: Dictionary)
+## Signal when navigation is targeted/marked
+signal navigation_marked
+## Signal when navigation is leave/un-marked
+signal navigation_unmarked
 ## Signal to trigger disable/deactivate physics_process
 signal disable_physics
 ## Signal to trigger enable/activate physics_process
 signal enable_physics
-## Signal to trigger when the actor is hitted with the interaction casts hit or not
-signal interaction_casts_hit
-## Signal to turning off all the casts that been hitted with
-signal off_casts_target
 
 ## Variable group name for the node [Actor3D]
 @export var groupname: String = 'actor'
@@ -77,7 +36,49 @@ signal off_casts_target
 ## Maximum speed when [Actor3DComponent] is moving
 @export_range(1, 99) var speed: float = 12.5
 
-## Variable base object class
-var base: Base
+## Class main physics for [Actor3D] for the basic physics and process in actor
+class Physics extends Actor3DPhysics:
+	func _init(n: Actor3D) -> void:
+		set_actor(n)
+	
+	## Set the velocity processing of the [Actor3D] if physics status is enable
+	func set_velocity_process(v: Vector3) -> void:
+		if get_physics():
+			set_velocity(v)
+			get_actor().velocity = get_velocity()
+
+## Class utilities for [Actor3D] that use movement based on navigation path finding
+class Navigation extends Physics:
+	var _actor_targeted: Actor3D
+	var _actor_target: CharacterBody3D
+	
+	func _init(n: Actor3D) -> void:
+		super(n)
+	
+	## A method when condition navigation is set to the [Actor3D] target
+	func navigated_to_actor(c: Actor3D) -> void:
+		# Check if instance id is not same then it's should be proceed to navigate
+		if c.get_instance_id() != get_actor().get_instance_id():
+			_actor_targeted = c
+			
+			# Check if face has signal to activate the interaction
+			if get_face().has_signal('enable_interaction'):
+				get_face().emit_signal('enable_interaction', _actor_target.get_instance_id())
+	
+	## Global navigation to target either is collision or [Actor3D]
+	func navigation_to_target(d: Dictionary) -> void:
+		if not d.is_empty() and get_physics():
+			var c = d.collider
+			
+			if c.get_class() == 'Actor3D':
+				navigated_to_actor(c)
+			
+			if _actor_target != null and _actor_target.has_signal('navigation_unmarked'):
+				_actor_target.emit_signal('navigation_unmarked')
+			
+			get_navigation_agent().set_target_position(d.position)
+
+## Variable physics object class
+var physics: Physics
 ## Variable navigation object class
 var navigation: Navigation

@@ -1,45 +1,56 @@
+extends PersistClass
 class_name Stage3DClass
 
-## Variable reference for the [Node3D] stage
-var _stage: Node3D
+## Variable main node of the [Stage3D]
+var _stage: Stage3D
 
-## Set the variable [Node3D] stage
-func set_stage(node: Node3D) -> void:
-	_stage = node
+## Set the node of the [Stage3D]
+func set_stage(n: Stage3D) -> void:
+	_stage = n
 
-## Return value of [Node3D] stage
-func get_stage() -> Node3D:
+## Return node [Stage3D]
+func get_stage() -> Stage3D:
 	return _stage
 
-## Variable reference for the [Node3D] level
-var _level: Node3D
+## Variable node of the [Scene3D]
+var _scene: Scene3D
 
-## Set the variable [Node3D] level
-func set_level(node: Node3D) -> void:
-	_level = node
+## Set the node of the [Scene3D]
+func set_scene(n: Scene3D) -> void:
+	_scene = n
 
-## Return value of [Node3D] level
-func get_level() -> Node3D:
-	return _level
+## Return node [Scene3D]
+func get_scene() -> Scene3D:
+	return _scene
 
-## Variable reference for lists array of [Area3D] edges area
-var _area_edges: Array[Area3D]
+## Variable node of the [CamView3D] in the [Stage3D]
+var _camviews: Array[CamView3D]
 
-## Set the variable lists array of [Area3D] edges area
-func set_area_edges(lists: Array[Area3D]) -> void:
-	_area_edges = lists
+## Method to set an resources [CamViews3D] in [Scene3D]
+func append_camview(r: NodePath) -> void:
+	_camviews.append(get_stage().get_node(r))
 
-## Return value of lists array of [Area3D] edges area
-func get_area_edges() -> Array[Area3D]:
-	return _area_edges
+## Method to bulk add resources [CamViews3D] in [Scene3D]
+func set_camviews(l: Array[NodePath]) -> void:
+	for i in l:
+		append_camview(i)
 
-## Variable reference for lists array of [Node3D] spawn_points player
-var _spawn_points: Array[Node3D]
+## Return all the [CamViews3D] in [Scene3D]
+func get_camviews() -> Array[CamView3D]:
+	return _camviews
 
-## Set the variable lists array of [Node3D] spawn_points player
-func set_spawn_points(lists: Array[Node3D]) -> void:
-	_spawn_points = lists
+## Variable node of the [Node3D] in the [Stage3D]
+var _actor_posts: Array[Node3D]
 
-## Return value of lists array of [Node3D] spawn_points player
-func get_spawn_points() -> Array[Node3D]:
-	return _spawn_points
+## Method to set an resources [Nodes3D] in [Scene3D]
+func append_actor_post(r: NodePath) -> void:
+	_actor_posts.append(get_stage().get_node(r))
+
+## Method to bulk add resources [Nodes3D] in [Scene3D]
+func set_actor_posts(l: Array[NodePath]) -> void:
+	for i in l:
+		append_actor_post(i)
+
+## Return all the [Nodes3D] in [Scene3D]
+func get_actor_posts() -> Array[Node3D]:
+	return _actor_posts

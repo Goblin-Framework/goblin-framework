@@ -1,35 +1,31 @@
 extends Node3D
 class_name Stage3D
 
-class Base extends Stage3DProcessorClass:
-	func _init(node: Node3D):
-		set_stage(node)
-	
-	func set_actor_to_spawn_point(actor: CharacterBody3D, idx: int) -> void:
-		var spawn_point = get_spawn_points()[idx]
-		spawn_point.call_deferred('add_child', actor)
-	
-	func set_camera_to_spawn_point(camera: Camera3D, idx: int) -> void:
-		var spawn_point = get_spawn_points()[idx]
-		spawn_point.call_deferred('add_child', camera)
-		camera.current = true
-	
-	func del_actor_from_spawn_point(actor: CharacterBody3D, idx: int) -> void:
-		var spawn_point = get_spawn_points()[idx]
-		spawn_point.call_deferred('remove_child', actor)
-		
-	func del_camera_from_spawn_point(camera: Camera3D, idx: int) -> void:
-		var spawn_point = get_spawn_points()[idx]
-		spawn_point.call_deferred('remove_child', camera)
-		camera.current = false
+## Signal to dismantle the [Stage3D]
+signal dismantle
 
-signal leaving_current_stage
+signal assemble
 
-## Variable group name for the node [Inventory]
+## Variable group name for the node [Stage3D]
 @export var groupname: String = 'stage'
-@export var actor_player: Resource
-@export var camera_view: Resource
-@export var spawn_points: Array[NodePath]
-@export var area_edges: Array[NodePath]
 
-var base: Base
+@export_subgroup('Setup')
+## Variable node collections [CamView3D] in the [Stage3D]
+@export var camviews: Array[NodePath]
+@export var camview_unique_name: String
+@export var actor_player_posts: Array[NodePath]
+@export var actor_player_post_index: int
+
+#TODO: tambahkan comment dokumentasi pada method disini
+
+class Processor extends Stage3DProcessorClass:
+	func _init(n: Stage3D):
+		set_stage(n)
+	
+	func set_first_actor_to_post_by_index(v: int) -> void:
+		var actor = get_scene().processor.get_playable_actors()[0]
+		var post  = get_actor_posts()[v]
+		
+		post.call_deferred('add_child', actor)
+
+var processor: Processor

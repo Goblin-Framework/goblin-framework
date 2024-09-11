@@ -1,3 +1,4 @@
+extends PersistClass
 class_name Camera3DClass
 
 ## Variable reference for [Camera3D]
@@ -61,14 +62,13 @@ func set_viewport_size(screen: Vector2) -> void:
 func get_viewport_size() -> Vector2:
 	return _viewport_size
 
-## Variable reference for [CharacterBody3D] set in camera focused
-var _actor: CharacterBody3D
+## Variable reference for [Actor3D] set in camera focused
+var _actor: Actor3D
 
-## Set variable reference for [CharacterBody3D] in camera focused
-func set_actor(node: CharacterBody3D):
+## Set variable reference for [Actor3D] in camera focused
+func set_actor(node: Actor3D):
 	_actor = node
 
-## Variable reference for [CharacterBody3D] set in camera focused
-func get_actor() -> CharacterBody3D:
+## Variable reference for [Actor3D] set in camera focused
+func get_actor() -> Actor3D:
 	return _actor
-

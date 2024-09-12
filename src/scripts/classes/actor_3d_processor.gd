@@ -34,11 +34,15 @@ func get_velocity_interpolated() -> Vector3:
 	var accel  = get_acceleration() if normalized.dot(hvel) > 0 else get_deacceleration()
 	return hvel.lerp(course, accel * get_delta())
 
+## Variable reference if [CharacterBody3D] is dead
 var _is_dead: bool
 
+## Update the health point for [CharacterBody3D]
 func health_point_updated(value: int) -> void:
 	set_health_point(get_health_point() + value)
 	_is_dead = bool(get_health_point() > 1)
+	
+#TODO: tambahkan comment dokumentasi pada method disini
 
 func get_is_dead() -> bool:
 	return _is_dead

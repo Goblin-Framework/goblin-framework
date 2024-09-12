@@ -1,3 +1,4 @@
+extends PersistClass
 class_name Actor3DClass
 
 ## Variable reference for node [CharacterBody3D]

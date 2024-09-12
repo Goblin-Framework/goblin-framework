@@ -1,41 +1,14 @@
 extends CharacterBody3D
 class_name Actor3D
 
-## Class utilities base for [Actor3D] for the basic physics and process in actor
-class Base extends Actor3DPhysics:
-	func _init(node: Actor3D):
-		set_actor(node)
-	
-	## Set the velocity processing of the [Actor3D] if physics status is enable
-	func set_velocity_process(value: Vector3) -> void:
-		if get_physics():
-			set_velocity(value)
-			get_actor().velocity = get_velocity()
-	
-	func get_randomize_greetings() -> String:
-		var i = randi_range(0, get_actor().greetings.size() - 1)
-		return get_actor().greetings[i]
-
-## Class utilities for [Actor3D] that use movement based on navigation path finding
-class Navigation extends Base:
-	func _init(node: Actor3D):
-		super(node)
-	
-	func on_receive_pointing_camera_information(value: Dictionary) -> void:
-		if not value.is_empty() and get_physics():
-			if value.collider.get_class() == 'CharacterBody3D':
-				if value.collider.get_instance_id() != get_instance_id():
-					get_face().emit_signal('enable_interaction_casts')
-					get_navigation_agent().set_target_position(value.position)
-			
-			else:
-				get_navigation_agent().set_target_position(value.position)
-
-var _face: Face3DComponent
-var _target_id
-
-## Signal to trigger when receiving pointing camera information in 3D space
-signal receive_pointing_camera_information(value: Dictionary)
+## Signal to trigger when navigation is interacting to
+signal navigation_interact_to(value: Dictionary)
+## Signal when navigation is targeted/marked
+signal navigation_marked
+## Signal when navigation is leave/un-marked
+signal navigation_unmarked
+## Signal when interaction with is active
+signal interaction_with_active(actor: Actor3D)
 ## Signal to trigger disable/deactivate physics_process
 signal disable_physics
 ## Signal to trigger enable/activate physics_process
@@ -45,6 +18,7 @@ signal enable_physics
 @export var groupname: String = 'actor'
 ## Variable to set Pivot/Mesh for [Actor3D]
 @export var face_node: NodePath
+@export var universal_action_key_input: String = 'universal_action'
 
 @export_subgroup('Health-Force-Stamina')
 ## Value of the health/life point of the [Actor3D]
@@ -64,10 +38,53 @@ signal enable_physics
 ## Maximum speed when [Actor3DComponent] is moving
 @export_range(1, 99) var speed: float = 12.5
 
-@export_category('NPC')
-@export var greetings: Array[String]
+## Class main physics for [Actor3D] for the basic physics and process in actor
+class Physics extends Actor3DPhysics:
+	func _init(n: Actor3D) -> void:
+		set_actor(n)
+	
+	## Set the velocity processing of the [Actor3D] if physics status is enable
+	func set_velocity_process(v: Vector3) -> void:
+		if get_physics():
+			set_velocity(v)
+			get_actor().velocity = get_velocity()
 
-## Variable base object class
-var base: Base
+## Class utilities for [Actor3D] that use movement based on navigation path finding
+class Navigation extends Physics:
+	var _actor_target: Actor3D
+	
+	func _init(n: Actor3D) -> void:
+		super(n)
+	
+	## A method when condition navigation is set to the [Actor3D] target
+	func navigated_to_actor(c: Actor3D) -> void:
+		# Check if instance id is not same then it's should be proceed to navigate
+		if c.get_instance_id() != get_actor().get_instance_id():
+			_actor_target = c
+			assert(_actor_target.has_signal('navigation_marked'), Common.Exception.signal_not_found('navigation_marked', _actor_target))
+			
+			_actor_target.emit_signal('navigation_marked')
+			
+			# Check if face has signal to activate the interaction
+			if get_face().has_signal('enable_interaction'):
+				get_face().emit_signal('enable_interaction', _actor_target.get_instance_id())
+	
+	## Global navigation to target either is collision or [Actor3D]
+	func navigation_to_target(d: Dictionary) -> void:
+		if not d.is_empty() and get_physics():
+			var c = d.collider
+			
+			# If previous actor target is not null and previous actor target is not the current target id, then unmarking navigation to the previous target
+			if _actor_target != null and _actor_target.get_instance_id() != c.get_instance_id():
+				assert(_actor_target.has_signal('navigation_unmarked'), Common.Exception.signal_not_found('navigation_unmarked', _actor_target))
+				_actor_target.emit_signal('navigation_unmarked')
+			
+			if c.get_class() == 'CharacterBody3D':
+				navigated_to_actor(c)
+			
+			get_navigation_agent().set_target_position(d.position)
+
+## Variable physics object class
+var physics: Physics
 ## Variable navigation object class
 var navigation: Navigation

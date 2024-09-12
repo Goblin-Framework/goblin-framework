@@ -14,6 +14,8 @@ func navigated_velocity(max_climb: float) -> void:
 	
 	set_velocity(velocity)
 
+#TODO: tambahkan comment dokumentasi pada method disini
+
 func health_point_consumed(value: int) -> void:
 	health_point_updated(-value)
 

@@ -44,19 +44,39 @@ func physics_process_camview_screen_edges(o: Physics) -> void:
 		follow_actor = false
 		o.rightward()
 
+func physics_process_camview_point_click(o: Physics) -> void:
+	if current:
+		o.projecting_camera_ray()
+		o.set_world_3D_projection_ray(get_world_3d().direct_space_state, area_collision)
+		
+		if Input.get_action_strength(cursor_interact_input) > 0 and not actor_selected.is_empty():
+			for i: Actor3D in actor_selected:
+				i.emit_signal(
+					'navigation_interact_to',
+					o.get_world_3D_projection_ray()
+				)
+
 func physics_process_camview_top_down(o: TopDown) -> void:
-	o.projecting_camera_ray()
-	physics_process_camview(o)
-	
-	if screen_edges:
-		physics_process_camview_screen_edges(o)
-	
-	if follow_actor and o.get_actor() != null:
-		o.follow_actor()
+	if current:
+		o.projecting_camera_ray()
+		physics_process_camview(o)
+		
+		if screen_edges:
+			physics_process_camview_screen_edges(o)
+		
+		if follow_actor and o.get_actor() != null:
+			o.follow_actor()
 	
 func input_camview_zoom(e: InputEvent, o: Physics) -> void:
-	if e.get_action_strength(zoom_in_input) > 0:
-		o.zoom_in(min_zoom)
-	
-	if e.get_action_strength(zoom_out_input) > 0:
-		o.zoom_out(max_zoom)
+	if current:
+		if e.get_action_strength(zoom_in_input) > 0:
+			o.zoom_in(min_zoom)
+		
+		if e.get_action_strength(zoom_out_input) > 0:
+			o.zoom_out(max_zoom)
+
+func input_point_click(o: Physics) -> void:
+	if Input.is_action_just_pressed(cursor_select_input) and current:
+		o.projecting_camera_ray()
+		o.set_world_3D_projection_ray(get_world_3d().direct_space_state, area_collision)
+		o.set_selected(o.get_world_3D_projection_ray())

@@ -48,10 +48,10 @@ func _physics_process(delta):
 				if _player.navigation != null:
 					_player.navigation.get_navigation_agent().target_position = _player.global_position
 				
-				if collider.has_signal('interaction_casts_hit'):
-					collider.emit_signal('interaction_casts_hit', _player)
+				if collider.has_signal('interaction_with_active'):
+					collider.emit_signal('interaction_with_active', _player)
 				
-				emit_signal('disable_interaction_casts')
+				emit_signal('disable_interaction')
 
 ## Instantiate a new [RayCast3D] with it's requirements
 func ray_cast(rotate: float, mask: int) -> RayCast3D:

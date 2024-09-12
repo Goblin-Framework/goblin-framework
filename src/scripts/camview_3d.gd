@@ -58,7 +58,17 @@ class Physics extends Camera3DPhysicsClass:
 	## Set the cross vector calculation by sensitivity value
 	func set_cross_vector_calculation(sensitivity) -> void:
 		set_cross_vector(Vector2(sensitivity, sensitivity * 1.5))
-
+		
+	func set_selected(d: Dictionary) -> void:
+		# reset the array actor selected
+		get_camera().actor_selected = []
+		
+		if not d.is_empty():
+			var c = d.collider
+			
+			if c.get_class() == 'CharacterBody3D':
+				get_camera().actor_selected = [c]
+	
 ## Class utilities for angle top-down in [CamView3D]
 class TopDown extends Physics:
 	var _origin: Vector3

@@ -7,6 +7,8 @@ signal navigation_interact_to(value: Dictionary)
 signal navigation_marked
 ## Signal when navigation is leave/un-marked
 signal navigation_unmarked
+## Signal when interaction with is active
+signal interaction_with_active(actor: Actor3D)
 ## Signal to trigger disable/deactivate physics_process
 signal disable_physics
 ## Signal to trigger enable/activate physics_process
@@ -49,8 +51,7 @@ class Physics extends Actor3DPhysics:
 
 ## Class utilities for [Actor3D] that use movement based on navigation path finding
 class Navigation extends Physics:
-	var _actor_targeted: Actor3D
-	var _actor_target: CharacterBody3D
+	var _actor_target: Actor3D
 	
 	func _init(n: Actor3D) -> void:
 		super(n)
@@ -59,7 +60,10 @@ class Navigation extends Physics:
 	func navigated_to_actor(c: Actor3D) -> void:
 		# Check if instance id is not same then it's should be proceed to navigate
 		if c.get_instance_id() != get_actor().get_instance_id():
-			_actor_targeted = c
+			_actor_target = c
+			assert(_actor_target.has_signal('navigation_marked'), Common.Exception.signal_not_found('navigation_marked', _actor_target))
+			
+			_actor_target.emit_signal('navigation_marked')
 			
 			# Check if face has signal to activate the interaction
 			if get_face().has_signal('enable_interaction'):
@@ -70,11 +74,13 @@ class Navigation extends Physics:
 		if not d.is_empty() and get_physics():
 			var c = d.collider
 			
-			if c.get_class() == 'Actor3D':
-				navigated_to_actor(c)
-			
-			if _actor_target != null and _actor_target.has_signal('navigation_unmarked'):
+			# If previous actor target is not null and previous actor target is not the current target id, then unmarking navigation to the previous target
+			if _actor_target != null and _actor_target.get_instance_id() != c.get_instance_id():
+				assert(_actor_target.has_signal('navigation_unmarked'), Common.Exception.signal_not_found('navigation_unmarked', _actor_target))
 				_actor_target.emit_signal('navigation_unmarked')
+			
+			if c.get_class() == 'CharacterBody3D':
+				navigated_to_actor(c)
 			
 			get_navigation_agent().set_target_position(d.position)
 

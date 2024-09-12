@@ -1,15 +1,15 @@
 extends PersistClass
 class_name Camera3DClass
 
-## Variable reference for [Camera3D]
-var _camera: Camera3D
+## Variable reference for [CamView3D]
+var _camera: CamView3D
 
-## Set [Camera3D] into variable reference
-func set_camera(node: Camera3D) -> void:
+## Set [CamView3D] into variable reference
+func set_camera(node: CamView3D) -> void:
 	_camera = node
 
-## Return the variable reference [Camera3D]
-func get_camera() -> Camera3D:
+## Return the variable reference [CamView3D]
+func get_camera() -> CamView3D:
 	return _camera
 
 ## Variable reference for cursor position [Vector2]

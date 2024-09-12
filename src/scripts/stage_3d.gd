@@ -23,9 +23,11 @@ class Processor extends Stage3DProcessorClass:
 		set_stage(n)
 	
 	func set_first_actor_to_post_by_index(v: int) -> void:
-		var actor = get_scene().processor.get_playable_actors()[0]
 		var post  = get_actor_posts()[v]
 		
-		post.call_deferred('add_child', actor)
+		post.call_deferred('add_child', get_first_actor())
+	
+	func get_first_actor() -> Actor3D:
+		return get_scene().processor.get_playable_actors()[0]
 
 var processor: Processor

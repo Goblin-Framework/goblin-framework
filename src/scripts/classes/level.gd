@@ -14,10 +14,15 @@ const ERROR_PARENT = 'Fatal Error! The node must be a child of \'Root\' node:'
 ## Variable to reference type of the node [Level] on development mode
 var development: bool = true
 
+## Variable references of the [Root] node
+var root: Root
+
+## variable main node of the [Level]
 var node: Level:
 	set(n):
 		if !development:
 			assert(n.get_parent() is Root, ERROR_PARENT + n.name)
+			root = n.get_parent()
 			
 		node        = n
 		persists    = node

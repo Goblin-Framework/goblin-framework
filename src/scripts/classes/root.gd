@@ -7,18 +7,18 @@ class_name RootClass
 ## Variable main node of the [Root]
 var node: Root
 
-## Variable collection nodes of the [Scene] in [Root]
-var scenes: Array[Scene]
+## Variable collection nodes of the [Level] in [Root]
+var levels: Array[Level]
 
-## Variable active node of the [Scene] in [Root]
-var active_scene: Scene
+## Variable active node of the [Level] in [Root]
+var active_level: Level
 
 ## Variable main node of UI of the main menu
 var main_menu: Control
  
-## A metnod to set the activate scene by finding the match uid of the [Scene]
-func activate_scene(v: String) -> void:
-	for i in scenes:
+## A metnod to set the activate level by finding the match uid of the [level]
+func activate_level(v: String) -> void:
+	for i in levels:
 		if i.uid == v:
-			active_scene = i
+			active_level = i
 			return
